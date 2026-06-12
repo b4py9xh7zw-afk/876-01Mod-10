@@ -70,4 +70,29 @@ class User extends Authenticatable
     {
         return $this->hasMany(ExamRecord::class, 'user_id');
     }
+
+    public function examArrangements()
+    {
+        return $this->hasMany(ExamArrangement::class, 'user_id');
+    }
+
+    public function seatChangeRecordsAsUser()
+    {
+        return $this->hasMany(SeatChangeRecord::class, 'user_id');
+    }
+
+    public function seatChangeRecordsAsOperator()
+    {
+        return $this->hasMany(SeatChangeRecord::class, 'operator_id');
+    }
+
+    public function proctorLogsAsUser()
+    {
+        return $this->hasMany(ProctorLog::class, 'user_id');
+    }
+
+    public function proctorLogsAsOperator()
+    {
+        return $this->hasMany(ProctorLog::class, 'operator_id');
+    }
 }

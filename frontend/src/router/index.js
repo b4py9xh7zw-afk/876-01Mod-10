@@ -27,6 +27,12 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/my-exams',
+    name: 'MyExams',
+    component: () => import('../views/exams/MyArrangements.vue'),
+    meta: { requiresAuth: true, roles: ['admin', 'teacher', 'student'] }
+  },
+  {
     path: '/exams/:id',
     name: 'TakeExam',
     component: () => import('../views/exams/Take.vue'),
@@ -54,6 +60,30 @@ const routes = [
     path: '/statistics',
     name: 'Statistics',
     component: () => import('../views/statistics/Index.vue'),
+    meta: { requiresAuth: true, roles: ['admin', 'teacher'] }
+  },
+  {
+    path: '/exam-rooms',
+    name: 'ExamRooms',
+    component: () => import('../views/exam-rooms/Index.vue'),
+    meta: { requiresAuth: true, roles: ['admin', 'teacher'] }
+  },
+  {
+    path: '/exam-arrangements',
+    name: 'ExamArrangements',
+    component: () => import('../views/exam-arrangements/Index.vue'),
+    meta: { requiresAuth: true, roles: ['admin', 'teacher'] }
+  },
+  {
+    path: '/proctor/scan',
+    name: 'ProctorScan',
+    component: () => import('../views/proctor/Scan.vue'),
+    meta: { requiresAuth: true, roles: ['admin', 'teacher'] }
+  },
+  {
+    path: '/proctor/logs',
+    name: 'ProctorLogs',
+    component: () => import('../views/proctor/Logs.vue'),
     meta: { requiresAuth: true, roles: ['admin', 'teacher'] }
   }
 ]

@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\ExamArrangement;
 use App\Models\ExamPaper;
 use App\Models\ExamRecord;
 use App\Models\ExamRecordAnswer;
+use App\Models\ProctorLog;
 use App\Models\Question;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -38,11 +40,65 @@ class ExamController extends Controller
             ]);
         }
 
+        $arrangement = ExamArrangement::where('exam_paper_id', $examPaper->id)
+            ->where('user_id', $request->user()->id)
+            ->whereIn('status', [ExamArrangement::STATUS_CHECKED_IN, ExamArrangement::STATUS_EXAMINING])
+            ->first();
+
+        if (!$arrangement) {
+            $hasArrangement = ExamArrangement::where('exam_paper_id', $examPaper->id)
+                ->where('user_id', $request->user()->id)
+                ->first();
+
+            if (!$hasArrangement) {
+                return response()->json([
+                    'message' => '您未被安排在此场考试，请联系教务安排座位',
+                ], 403);
+            }
+
+            if ($hasArrangement->status === ExamArrangement::STATUS_ASSIGNED) {
+                return response()->json([
+                    'message' => '您尚未签到，请先到指定座位签到后再开始考试',
+                    'arrangement' => [
+                        'checkin_code' => $hasArrangement->checkin_code,
+                        'seat_info' => $hasArrangement->examSeat ? [
+                            'seat_number' => $hasArrangement->examSeat->seat_number,
+                            'computer_code' => $hasArrangement->examSeat->computer_code,
+                            'room_name' => $hasArrangement->examSeat->examRoom->name ?? null,
+                            'room_location' => $hasArrangement->examSeat->examRoom->location ?? null,
+                        ] : null,
+                    ],
+                ], 403);
+            }
+
+            return response()->json([
+                'message' => '您当前状态无法开始考试，状态：' . ExamArrangement::STATUSES[$hasArrangement->status] ?? $hasArrangement->status,
+            ], 403);
+        }
+
         $record = ExamRecord::create([
             'user_id' => $request->user()->id,
             'exam_paper_id' => $examPaper->id,
+            'exam_seat_id' => $arrangement->exam_seat_id,
+            'exam_arrangement_id' => $arrangement->id,
             'start_time' => now(),
             'status' => 'in_progress',
+            'exam_ip' => $request->ip(),
+        ]);
+
+        $arrangement->update([
+            'status' => ExamArrangement::STATUS_EXAMINING,
+        ]);
+
+        ProctorLog::create([
+            'exam_paper_id' => $examPaper->id,
+            'exam_seat_id' => $arrangement->exam_seat_id,
+            'user_id' => $request->user()->id,
+            'log_type' => ProctorLog::TYPE_VERIFICATION,
+            'content' => "学生 {$request->user()->real_name} 在座位 {$arrangement->examSeat->seat_number} 开始考试，电脑编号：{$arrangement->examSeat->computer_code}",
+            'severity' => ProctorLog::SEVERITY_NORMAL,
+            'operator_id' => null,
+            'operator_ip' => $request->ip(),
         ]);
 
         $questions = $examPaper->questions()->get();
@@ -65,6 +121,10 @@ class ExamController extends Controller
                 'title' => $examPaper->title,
                 'total_time' => $examPaper->total_time,
                 'total_score' => $examPaper->total_score,
+            ],
+            'seat_info' => [
+                'seat_number' => $arrangement->examSeat->seat_number,
+                'computer_code' => $arrangement->examSeat->computer_code,
             ],
             'questions' => $questionsData,
         ]);
@@ -148,6 +208,15 @@ class ExamController extends Controller
             'score' => $totalScore,
             'status' => 'graded',
         ]);
+
+        if ($record->exam_arrangement_id) {
+            $arrangement = ExamArrangement::find($record->exam_arrangement_id);
+            if ($arrangement) {
+                $arrangement->update([
+                    'status' => ExamArrangement::STATUS_SUBMITTED,
+                ]);
+            }
+        }
 
         return response()->json([
             'message' => '提交成功',

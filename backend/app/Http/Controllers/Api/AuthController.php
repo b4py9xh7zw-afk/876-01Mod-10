@@ -82,4 +82,29 @@ class AuthController extends Controller
             'user' => $request->user(),
         ]);
     }
+
+    public function students(Request $request)
+    {
+        if (!$request->user()->isAdmin() && !$request->user()->isTeacher()) {
+            abort(403, '无权执行此操作');
+        }
+
+        $query = User::where('role', User::ROLE_STUDENT)->where('status', true);
+
+        if ($request->filled('keyword')) {
+            $keyword = '%' . $request->input('keyword') . '%';
+            $query->where(function ($q) use ($keyword) {
+                $q->where('username', 'like', $keyword)
+                    ->orWhere('real_name', 'like', $keyword)
+                    ->orWhere('email', 'like', $keyword);
+            });
+        }
+
+        $students = $query->orderBy('id', 'desc')
+            ->get(['id', 'username', 'real_name', 'email']);
+
+        return response()->json([
+            'students' => $students,
+        ]);
+    }
 }

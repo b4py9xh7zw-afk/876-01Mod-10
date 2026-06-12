@@ -54,6 +54,16 @@ class ExamPaper extends Model
         return $this->hasMany(ExamRecord::class, 'exam_paper_id');
     }
 
+    public function examArrangements()
+    {
+        return $this->hasMany(ExamArrangement::class, 'exam_paper_id');
+    }
+
+    public function proctorLogs()
+    {
+        return $this->hasMany(ProctorLog::class, 'exam_paper_id');
+    }
+
     public function updateQuestionCountAndScore()
     {
         $this->question_count = $this->questions()->count();

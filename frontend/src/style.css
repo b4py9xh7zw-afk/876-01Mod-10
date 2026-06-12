@@ -254,3 +254,51 @@ html {
   background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
   border-radius: 50%;
 }
+
+/* Card Accent Styles */
+.card-accent-left {
+  position: relative;
+}
+
+.card-accent-left::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  border-top-left-radius: 1rem;
+  border-bottom-left-radius: 1rem;
+}
+
+.card-accent-indigo::before {
+  background: #6366f1;
+}
+
+.card-accent-blue::before {
+  background: #3b82f6;
+}
+
+.card-accent-green::before {
+  background: #10b981;
+}
+
+.card-accent-purple::before {
+  background: #8b5cf6;
+}
+
+.card-accent-orange::before {
+  background: #f59e0b;
+}
+
+.card-accent-cyan::before {
+  background: #06b6d4;
+}
+
+.card-accent-violet::before {
+  background: #8b5cf6;
+}
+
+.card-accent-rose::before {
+  background: #f43f5e;
+}

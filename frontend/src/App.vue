@@ -93,6 +93,13 @@
               <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-indigo-500">考试系统</span>
             </router-link>
             <div class="hidden md:flex ml-10 space-x-2">
+              <router-link
+                to="/my-exams"
+                class="nav-link"
+                :class="{ 'nav-link-active': $route.path === '/my-exams' }"
+              >
+                我的考场
+              </router-link>
               <router-link 
                 to="/exams" 
                 class="nav-link"
@@ -122,6 +129,38 @@
                 :class="{ 'nav-link-active': $route.path === '/exam-papers' }"
               >
                 试卷管理
+              </router-link>
+              <router-link
+                v-if="authStore.isTeacher"
+                to="/exam-rooms"
+                class="nav-link"
+                :class="{ 'nav-link-active': $route.path === '/exam-rooms' }"
+              >
+                机房管理
+              </router-link>
+              <router-link
+                v-if="authStore.isTeacher"
+                to="/exam-arrangements"
+                class="nav-link"
+                :class="{ 'nav-link-active': $route.path === '/exam-arrangements' }"
+              >
+                座位安排
+              </router-link>
+              <router-link
+                v-if="authStore.isTeacher"
+                to="/proctor/scan"
+                class="nav-link"
+                :class="{ 'nav-link-active': $route.path === '/proctor/scan' }"
+              >
+                巡考扫码
+              </router-link>
+              <router-link
+                v-if="authStore.isTeacher"
+                to="/proctor/logs"
+                class="nav-link"
+                :class="{ 'nav-link-active': $route.path === '/proctor/logs' }"
+              >
+                监考日志
               </router-link>
               <router-link 
                 v-if="authStore.isAdmin" 
@@ -153,10 +192,15 @@
       </div>
       <div class="md:hidden border-t border-gray-100">
         <div class="px-2 py-2 space-y-1">
+          <router-link to="/my-exams" class="mobile-nav-link" :class="{ 'mobile-nav-link-active': $route.path === '/my-exams' }">我的考场</router-link>
           <router-link to="/exams" class="mobile-nav-link" :class="{ 'mobile-nav-link-active': $route.path === '/exams' }">在线考试</router-link>
           <router-link to="/records" class="mobile-nav-link" :class="{ 'mobile-nav-link-active': $route.path === '/records' }">我的成绩</router-link>
           <router-link v-if="authStore.isTeacher" to="/questions" class="mobile-nav-link" :class="{ 'mobile-nav-link-active': $route.path === '/questions' }">题库管理</router-link>
           <router-link v-if="authStore.isTeacher" to="/exam-papers" class="mobile-nav-link" :class="{ 'mobile-nav-link-active': $route.path === '/exam-papers' }">试卷管理</router-link>
+          <router-link v-if="authStore.isTeacher" to="/exam-rooms" class="mobile-nav-link" :class="{ 'mobile-nav-link-active': $route.path === '/exam-rooms' }">机房管理</router-link>
+          <router-link v-if="authStore.isTeacher" to="/exam-arrangements" class="mobile-nav-link" :class="{ 'mobile-nav-link-active': $route.path === '/exam-arrangements' }">座位安排</router-link>
+          <router-link v-if="authStore.isTeacher" to="/proctor/scan" class="mobile-nav-link" :class="{ 'mobile-nav-link-active': $route.path === '/proctor/scan' }">巡考扫码</router-link>
+          <router-link v-if="authStore.isTeacher" to="/proctor/logs" class="mobile-nav-link" :class="{ 'mobile-nav-link-active': $route.path === '/proctor/logs' }">监考日志</router-link>
           <router-link v-if="authStore.isAdmin" to="/statistics" class="mobile-nav-link" :class="{ 'mobile-nav-link-active': $route.path === '/statistics' }">数据统计</router-link>
         </div>
       </div>

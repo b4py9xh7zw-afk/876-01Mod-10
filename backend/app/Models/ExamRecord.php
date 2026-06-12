@@ -12,10 +12,14 @@ class ExamRecord extends Model
     protected $fillable = [
         'user_id',
         'exam_paper_id',
+        'exam_seat_id',
+        'exam_arrangement_id',
         'start_time',
         'end_time',
         'score',
         'status',
+        'exam_ip',
+        'exam_mac',
     ];
 
     protected $casts = [
@@ -50,5 +54,15 @@ class ExamRecord extends Model
     public function answers()
     {
         return $this->hasMany(ExamRecordAnswer::class, 'exam_record_id');
+    }
+
+    public function examSeat()
+    {
+        return $this->belongsTo(ExamSeat::class, 'exam_seat_id');
+    }
+
+    public function examArrangement()
+    {
+        return $this->belongsTo(ExamArrangement::class, 'exam_arrangement_id');
     }
 }
